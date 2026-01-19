@@ -3,11 +3,11 @@ import 'package:api_flutter/widgets/pick_image_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:api_flutter/cubit/user_cubit.dart';
-import 'package:api_flutter/screens/profile_screen.dart';
+//import 'package:api_flutter/screens/profile_screen.dart';
 import 'package:api_flutter/widgets/custom_form_button.dart';
 import 'package:api_flutter/widgets/custom_input_field.dart';
-import 'package:api_flutter/widgets/dont_have_an_account.dart';
-import 'package:api_flutter/widgets/forget_password_widget.dart';
+//import 'package:api_flutter/widgets/dont_have_an_account.dart';
+//import 'package:api_flutter/widgets/forget_password_widget.dart';
 import 'package:api_flutter/widgets/page_header.dart';
 import 'package:api_flutter/widgets/page_heading.dart';
 
