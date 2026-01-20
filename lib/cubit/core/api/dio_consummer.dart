@@ -1,5 +1,6 @@
 import 'package:api_flutter/cubit/core/api/api_consummer.dart';
 import 'package:api_flutter/cubit/core/api/api_interceptors.dart';
+import 'package:api_flutter/cubit/core/api/end_ponits.dart';
 import 'package:api_flutter/cubit/core/errors/errore_model.dart';
 import 'package:api_flutter/cubit/core/errors/exceptions.dart';
 import 'package:dio/dio.dart';
@@ -8,7 +9,7 @@ class DioConsummer extends ApiConsummer {
   final Dio dio;
 
   DioConsummer({required this.dio}) {
-    dio.options.baseUrl = "https://food-api-omega.vercel.app/api/v1/";
+    dio.options.baseUrl = EndPonits.baseUrl;
     dio.interceptors.add(ApiInterceptors());
     dio.interceptors.add(
       LogInterceptor(
