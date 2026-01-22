@@ -26,6 +26,47 @@ class UserRepository {
     }
   }
 
+  Future<Either<String, String>> deleteUser() async {
+    try {
+      await api.delete(
+        EndPonits.deleteUserEndPoint(CacheHelper().getData(key: ApiKey.id)),
+      );
+
+      await CacheHelper().removeData(key: ApiKey.token);
+      await CacheHelper().removeData(key: ApiKey.id);
+
+      return const Right("تم حذف الحساب بنجاح");
+    } on ServereException catch (e) {
+      return Left(e.errModel.erroreMassage);
+    }
+  }
+
+  Future<Either<String, UserModel>> updateUserProfile({
+    String? name,
+    String? phone,
+    XFile? profilePic,
+  }) async {
+    try {
+      final data = <String, dynamic>{};
+
+      if (name != null) data[ApiKey.name] = name;
+      if (phone != null) data[ApiKey.phone] = phone;
+      if (profilePic != null) {
+        data[ApiKey.profilePic] = await uploadImageToAPI(profilePic);
+      }
+
+      final response = await api.patch(
+        EndPonits.updateUserEndPoint(CacheHelper().getData(key: ApiKey.id)),
+        isformdata: true,
+        data: data,
+      );
+
+      return Right(UserModel.fromJson(response));
+    } on ServereException catch (e) {
+      return Left(e.errModel.erroreMassage);
+    }
+  }
+
   Future<Either<String, SignUpModel>> signUp({
     required String name,
     required String phone,

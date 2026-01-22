@@ -5,6 +5,14 @@ class EndPonits {
   static String getUserDataEndPoint(id) {
     return "user/get-user/$id";
   }
+
+  static String updateUserEndPoint(String id) {
+    return "user/update-user/$id";
+  }
+
+  static String deleteUserEndPoint(String id) {
+    return "user/delete-user/$id";
+  }
 }
 
 class ApiKey {
