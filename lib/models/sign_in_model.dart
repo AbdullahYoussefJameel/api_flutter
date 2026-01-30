@@ -1,4 +1,4 @@
-import 'package:api_flutter/cubit/core/api/end_ponits.dart';
+import 'package:api_flutter/cubit/core/api/api_keys.dart';
 
 class SignInModel {
   final String message;
@@ -8,8 +8,8 @@ class SignInModel {
 
   factory SignInModel.fromJson(Map<String, dynamic> jsonData) {
     return SignInModel(
-      message: jsonData[ApiKey.message] ?? '',
-      token: jsonData[ApiKey.token] ?? '',
+      message: jsonData[ApiKeys.message] ?? '',
+      token: jsonData[ApiKeys.token] ?? '',
     );
   }
 }

@@ -1,45 +1,77 @@
-import 'package:api_flutter/models/user_model.dart';
+import 'package:equatable/equatable.dart';
+import '../models/user_model.dart';
 
-class UserState {}
+abstract class UserState extends Equatable {
+  const UserState();
 
-final class UserInitial extends UserState {}
-
-final class SignInSuccess extends UserState {}
-
-final class UpLoadProfileopic extends UserState {}
-
-final class SignInLoading extends UserState {}
-
-final class SignInFailure extends UserState {
-  final String errMessage;
-
-  SignInFailure({required this.errMessage});
+  @override
+  List<Object?> get props => [];
 }
 
-final class SignUpSuccess extends UserState {
-  final String massage;
-
-  SignUpSuccess({required this.massage});
+class UserInitial extends UserState {
+  const UserInitial();
 }
 
-final class SignUpLoading extends UserState {}
-
-final class SignUpFailure extends UserState {
-  final String errMessage;
-
-  SignUpFailure({required this.errMessage});
+// Sign In
+class SignInLoading extends UserState {
+  const SignInLoading();
 }
 
-final class GetUserSuccess extends UserState {
+class SignInSuccess extends UserState {
+  const SignInSuccess();
+}
+
+class SignInFailure extends UserState {
+  final String errorMessage;
+  const SignInFailure({required this.errorMessage});
+
+  @override
+  List<Object?> get props => [errorMessage];
+}
+
+// Sign Up
+class SignUpLoading extends UserState {
+  const SignUpLoading();
+}
+
+class SignUpSuccess extends UserState {
+  final String message;
+  const SignUpSuccess({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class SignUpFailure extends UserState {
+  final String errorMessage;
+  const SignUpFailure({required this.errorMessage});
+
+  @override
+  List<Object?> get props => [errorMessage];
+}
+
+// Profile Picture
+class UploadProfilePic extends UserState {
+  const UploadProfilePic();
+}
+
+// Get User
+class GetUserLoading extends UserState {
+  const GetUserLoading();
+}
+
+class GetUserSuccess extends UserState {
   final UserModel user;
+  const GetUserSuccess({required this.user});
 
-  GetUserSuccess({required this.user});
+  @override
+  List<Object?> get props => [user];
 }
 
-final class GetUserLoading extends UserState {}
+class GetUserFailure extends UserState {
+  final String errorMessage;
+  const GetUserFailure({required this.errorMessage});
 
-final class GetUserFailure extends UserState {
-  final String errMessage;
-
-  GetUserFailure({required this.errMessage});
+  @override
+  List<Object?> get props => [errorMessage];
 }

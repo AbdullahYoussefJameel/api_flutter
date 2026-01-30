@@ -32,7 +32,7 @@ class SignInScreen extends StatelessWidget {
           } else if (state is SignInFailure) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(state.errMessage)));
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
           }
         },
         builder: (context, state) {
@@ -74,7 +74,13 @@ class SignInScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
                             //! Forget password?
-                            ForgetPasswordWidget(size: size),
+                            ForgetPasswordWidget(
+                              onTap: () {
+                                // هنا ضع ما تريد فعله عند الضغط
+                                // مثال: فتح صفحة ForgetPassword
+                                // Navigator.push(context, MaterialPageRoute(builder: (_) => ForgetPasswordPage()));
+                              },
+                            ),
                             const SizedBox(height: 20),
                             //!Sign In Button
                             state is SignInLoading

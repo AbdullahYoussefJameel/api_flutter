@@ -1,25 +1,19 @@
-abstract class ApiConsummer {
-  Future<dynamic> get(
+/// Abstract class for API requests
+abstract class ApiConsumer {
+  Future<T> get<T>(String path, {Map<String, dynamic>? queryParameters});
+  Future<T> post<T>(
     String path, {
-    Object? data,
+    Object? body,
     Map<String, dynamic>? queryParameters,
   });
-  Future<dynamic> post(
+  Future<T> patch<T>(
     String path, {
-    Object? data,
+    Object? body,
     Map<String, dynamic>? queryParameters,
-    bool isformdata = false,
   });
-  Future<dynamic> patch(
+  Future<T> delete<T>(
     String path, {
-    Object? data,
+    Object? body,
     Map<String, dynamic>? queryParameters,
-    bool isformdata = false,
-  });
-  Future<dynamic> delete(
-    String path, {
-    Object? data,
-    Map<String, dynamic>? queryParameters,
-    bool isformdata = false,
   });
 }

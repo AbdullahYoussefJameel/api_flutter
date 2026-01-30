@@ -1,14 +1,14 @@
-import 'package:api_flutter/cubit/core/api/end_ponits.dart';
+/// Model for error responses
+class ErrorModel {
+  final String message;
+  final int statusCode;
 
-class ErroreModel {
-  final int status;
-  final String erroreMassage;
+  ErrorModel({required this.message, required this.statusCode});
 
-  ErroreModel({required this.status, required this.erroreMassage});
-  factory ErroreModel.fromJson(Map<String, dynamic> jsonData) {
-    return ErroreModel(
-      status: jsonData[ApiKey.status],
-      erroreMassage: jsonData[ApiKey.errorMassage],
+  factory ErrorModel.fromJson(Map<String, dynamic> json) {
+    return ErrorModel(
+      message: json['message'] ?? json['errorMessage'] ?? 'Unknown error',
+      statusCode: json['status'] ?? 0,
     );
   }
 }

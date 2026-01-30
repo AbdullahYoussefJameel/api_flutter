@@ -41,6 +41,7 @@ dependencies:
   jwt_decoder: ^2.0.1
   shared_preferences: ^2.5.4
   dartz: ^0.10.1
+  equatable: ^2.0.8
 
 dev_dependencies:
   flutter_test:

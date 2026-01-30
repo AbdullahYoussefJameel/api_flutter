@@ -1,58 +1,29 @@
-import 'package:api_flutter/cubit/core/errors/errore_model.dart';
+import 'errore_model.dart';
 import 'package:dio/dio.dart';
 
-class ServereException implements Exception {
-  final ErroreModel errModel;
+/// Exception class for API / Server errors
+class ServerException implements Exception {
+  final ErrorModel error;
 
-  ServereException({required this.errModel});
+  ServerException({required this.error});
+
+  @override
+  String toString() =>
+      'ServerException: ${error.message} (status: ${error.statusCode})';
 }
 
-void handleDioExcptions(DioException e) {
-  switch (e.type) {
-    case DioExceptionType.connectionTimeout:
-      throw ServereException(errModel: ErroreModel.fromJson(e.response!.data));
-    case DioExceptionType.sendTimeout:
-      throw ServereException(errModel: ErroreModel.fromJson(e.response!.data));
-    case DioExceptionType.receiveTimeout:
-      throw ServereException(errModel: ErroreModel.fromJson(e.response!.data));
-    case DioExceptionType.badCertificate:
-      throw ServereException(errModel: ErroreModel.fromJson(e.response!.data));
-    case DioExceptionType.cancel:
-      throw ServereException(errModel: ErroreModel.fromJson(e.response!.data));
-    case DioExceptionType.connectionError:
-      throw ServereException(errModel: ErroreModel.fromJson(e.response!.data));
-    case DioExceptionType.unknown:
-      throw ServereException(errModel: ErroreModel.fromJson(e.response!.data));
-    case DioExceptionType.badResponse:
-      switch (e.response?.statusCode) {
-        case 400: //bad request
-          throw ServereException(
-            errModel: ErroreModel.fromJson(e.response!.data),
-          );
-        case 401: //unauthorized
-          throw ServereException(
-            errModel: ErroreModel.fromJson(e.response!.data),
-          );
-        case 403: //forbidden
-          throw ServereException(
-            errModel: ErroreModel.fromJson(e.response!.data),
-          );
-        case 404: //not found
-          throw ServereException(
-            errModel: ErroreModel.fromJson(e.response!.data),
-          );
-        case 409: //cofficient
-          throw ServereException(
-            errModel: ErroreModel.fromJson(e.response!.data),
-          );
-        case 422: //unprocessable entity
-          throw ServereException(
-            errModel: ErroreModel.fromJson(e.response!.data),
-          );
-        case 504: //server excption
-          throw ServereException(
-            errModel: ErroreModel.fromJson(e.response!.data),
-          );
-      }
+/// Handles DioException and converts it to ServerException
+T handleDioException<T>(DioException e) {
+  final data = e.response?.data;
+
+  if (data is Map<String, dynamic>) {
+    throw ServerException(error: ErrorModel.fromJson(data));
+  } else {
+    throw ServerException(
+      error: ErrorModel(
+        message: data?.toString() ?? e.message ?? 'Network error',
+        statusCode: e.response?.statusCode ?? 0,
+      ),
+    );
   }
 }

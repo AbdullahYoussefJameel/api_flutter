@@ -20,11 +20,11 @@ class SignUpScreen extends StatelessWidget {
           if (state is SignUpSuccess) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(state.massage)));
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           } else if (state is SignUpFailure) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(state.errMessage)));
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
           }
         },
         builder: (context, state) {

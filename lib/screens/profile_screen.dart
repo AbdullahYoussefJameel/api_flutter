@@ -13,56 +13,66 @@ class ProfileScreen extends StatelessWidget {
         if (state is GetUserFailure) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.errMessage)));
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          body: state is GetUserLoading
-              ? const CircularProgressIndicator()
-              : state is GetUserSuccess
-              ? ListView(
-                  children: [
-                    const SizedBox(height: 16),
+        if (state is GetUserLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-                    //! Profile Picture
-                    CircleAvatar(
-                      radius: 80,
-                      backgroundImage: NetworkImage(state.user.profilepic),
-                    ),
-                    const SizedBox(height: 16),
+        if (state is GetUserSuccess) {
+          final user = state.user;
 
-                    //! Name
-                    ListTile(
-                      title: Text(state.user.name),
-                      leading: const Icon(Icons.person),
-                    ),
-                    const SizedBox(height: 16),
+          return Scaffold(
+            appBar: AppBar(title: const Text('Profile')),
+            body: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                //! Profile Picture
+                CircleAvatar(
+                  radius: 80,
+                  backgroundImage:
+                      user.profilePic != null && user.profilePic!.isNotEmpty
+                      ? NetworkImage(user.profilePic!)
+                      : const AssetImage('assets/images/default_avatar.png')
+                            as ImageProvider,
+                ),
+                const SizedBox(height: 16),
 
-                    //! Email
-                    ListTile(
-                      title: Text(state.user.email),
-                      leading: const Icon(Icons.email),
-                    ),
-                    const SizedBox(height: 16),
+                //! Name
+                ListTile(
+                  title: Text(user.name),
+                  leading: const Icon(Icons.person),
+                ),
 
-                    //! Phone number
-                    ListTile(
-                      title: Text(state.user.phone),
-                      leading: const Icon(Icons.phone),
-                    ),
-                    const SizedBox(height: 16),
+                //! Email
+                ListTile(
+                  title: Text(user.email),
+                  leading: const Icon(Icons.email),
+                ),
 
-                    //! Address
-                    ListTile(
-                      title: Text(state.user.address['type']),
-                      leading: const Icon(Icons.location_city),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                )
-              : Container(),
-        );
+                //! Phone number
+                ListTile(
+                  title: Text(user.phone),
+                  leading: const Icon(Icons.phone),
+                ),
+
+                //! Address (if exists)
+                if (user.location != null)
+                  ListTile(
+                    title: Text(user.location!['type'] ?? 'Unknown'),
+                    leading: const Icon(Icons.location_city),
+                  ),
+              ],
+            ),
+          );
+        }
+
+        // حالة افتراضية
+        return const Scaffold(body: Center(child: Text('No data available')));
       },
     );
   }

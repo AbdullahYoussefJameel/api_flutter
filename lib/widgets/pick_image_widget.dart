@@ -47,7 +47,7 @@ class PickImageWidget extends StatelessWidget {
                                     .then(
                                       (value) => context
                                           .read<UserCubit>()
-                                          .uploadprofilepic(value!),
+                                          .uploadProfilePic(value!),
                                     );
                               },
 

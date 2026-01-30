@@ -1,27 +1,43 @@
-import 'package:api_flutter/cubit/core/api/end_ponits.dart';
-
 class UserModel {
-  final String profilepic;
+  final String id;
+  final String name;
   final String email;
   final String phone;
-  final String name;
-  final Map<String, dynamic> address;
+  final String profilePic;
+  final Map<String, dynamic>? location; // 👈 هذا حقل location
 
   UserModel({
-    required this.profilepic,
+    required this.id,
+    required this.name,
     required this.email,
     required this.phone,
-    required this.name,
-    required this.address,
+    required this.profilePic,
+    this.location,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> jsonData) {
+  // ==== From JSON ====
+  factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      profilepic: jsonData[ApiKey.profilePic],
-      email: jsonData['user'][ApiKey.email],
-      phone: jsonData['user'][ApiKey.phone],
-      name: jsonData['user'][ApiKey.name],
-      address: jsonData['user'][ApiKey.location],
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      profilePic: json['profilePic'] ?? '',
+      location: json['location'] != null
+          ? Map<String, dynamic>.from(json['location'])
+          : null,
+    );
+  }
+
+  // ==== Empty user for delete / logout ====
+  factory UserModel.empty() {
+    return UserModel(
+      id: '',
+      name: '',
+      email: '',
+      phone: '',
+      profilePic: '',
+      location: null,
     );
   }
 }

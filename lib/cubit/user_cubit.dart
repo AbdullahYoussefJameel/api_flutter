@@ -1,167 +1,124 @@
-//import 'package:api_flutter/cashe/cashe_helper.dart';
-//import 'package:api_flutter/cubit/core/api/api_consummer.dart';
-//import 'package:api_flutter/cubit/core/api/end_ponits.dart';
-//import 'package:api_flutter/cubit/core/errors/exceptions.dart';
-//import 'package:api_flutter/cubit/core/functions/upload_image_to_api.dart';
+import 'package:api_flutter/cashe/cashe_helper.dart';
 import 'package:api_flutter/models/sign_in_model.dart';
-//import 'package:api_flutter/models/sign_up_model.dart';
-//import 'package:api_flutter/models/user_model.dart';
+import 'package:api_flutter/models/user_model.dart';
 import 'package:api_flutter/repositary/repositry.dart';
-//import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:api_flutter/cubit/user_state.dart';
 import 'package:image_picker/image_picker.dart';
-//import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:api_flutter/cubit/core/api/api_keys.dart';
 
 class UserCubit extends Cubit<UserState> {
-  UserCubit(this.userRepository) : super(UserInitial());
   final UserRepository userRepository;
 
-  //UserCubit(this.api) : super(UserInitial());
-  // final ApiConsummer api;
+  UserCubit(this.userRepository) : super(const UserInitial());
 
-  // Sign in Form key
-  GlobalKey<FormState> signInFormKey = GlobalKey();
-  // Sign in email & password
-  TextEditingController signInEmail = TextEditingController();
-  TextEditingController signInPassword = TextEditingController();
+  // ---------- Sign In Fields ----------
+  final GlobalKey<FormState> signInFormKey = GlobalKey<FormState>();
+  final TextEditingController signInEmail = TextEditingController();
+  final TextEditingController signInPassword = TextEditingController();
 
-  // Sign Up Form key
-  GlobalKey<FormState> signUpFormKey = GlobalKey();
-  // Profile Pic
+  // ---------- Sign Up Fields ----------
+  final GlobalKey<FormState> signUpFormKey = GlobalKey<FormState>();
+  final TextEditingController signUpName = TextEditingController();
+  final TextEditingController signUpPhoneNumber = TextEditingController();
+  final TextEditingController signUpEmail = TextEditingController();
+  final TextEditingController signUpPassword = TextEditingController();
+  final TextEditingController confirmPassword = TextEditingController();
   XFile? profilePic;
-  // Sign up fields
-  TextEditingController signUpName = TextEditingController();
-  TextEditingController signUpPhoneNumber = TextEditingController();
-  TextEditingController signUpEmail = TextEditingController();
-  TextEditingController signUpPassword = TextEditingController();
-  TextEditingController confirmPassword = TextEditingController();
 
+  // ---------- User Data ----------
   SignInModel? user;
 
-  uploadprofilepic(XFile image) {
+  // ---------- Upload Profile Picture ----------
+  void uploadProfilePic(XFile image) {
     profilePic = image;
-    emit(UpLoadProfileopic());
+    emit(const UploadProfilePic());
   }
 
-  signUp() async {
-    emit(SignUpLoading());
+  // ---------- Sign Up Function ----------
+  Future<void> signUp() async {
+    if (profilePic == null) {
+      emit(SignUpFailure(errorMessage: "Profile picture is required"));
+      return;
+    }
+
+    emit(const SignUpLoading());
+
     final response = await userRepository.signUp(
       name: signUpName.text,
       phone: signUpPhoneNumber.text,
       email: signUpEmail.text,
       password: signUpPassword.text,
-      confirmpassword: confirmPassword.text,
+      confirmPassword: confirmPassword.text,
       profilePic: profilePic!,
     );
+
     response.fold(
-      (errMassage) => emit(SignUpFailure(errMessage: errMassage)),
-      (signUpModel) => emit(SignUpSuccess(massage: signUpModel.message)),
+      (errMessage) => emit(SignUpFailure(errorMessage: errMessage)),
+      (signUpModel) => emit(SignUpSuccess(message: signUpModel.message)),
     );
   }
 
-  signIn() async {
-    emit(SignInLoading());
+  // ---------- Sign In Function ----------
+  Future<void> signIn() async {
+    emit(const SignInLoading());
+
     final response = await userRepository.signIn(
-      email: signUpEmail.text,
-      password: signUpPassword.text,
+      email: signInEmail.text,
+      password: signInPassword.text,
     );
+
     response.fold(
-      (errMassage) => emit(SignInFailure(errMessage: errMassage)),
-      (signUpModel) => emit(SignInSuccess()),
+      (errMessage) => emit(SignInFailure(errorMessage: errMessage)),
+      (signInModel) async {
+        user = signInModel;
+
+        if (user!.token.isEmpty) {
+          emit(SignInFailure(errorMessage: "Invalid credentials"));
+          return;
+        }
+
+        // Decode token to get user ID
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(user!.token);
+        String userId = decodedToken[ApiKeys.id] ?? '';
+
+        // Save token and userId in cache
+        await CacheHelper.save(key: ApiKeys.token, value: user!.token);
+        await CacheHelper.save(key: ApiKeys.id, value: userId);
+
+        emit(const SignInSuccess());
+      },
     );
   }
 
-  getUserProfile() async {
-    emit(GetUserLoading());
+  // ---------- Get User Profile ----------
+  Future<void> getUserProfile() async {
+    emit(const GetUserLoading());
+
     final response = await userRepository.getUserProfile();
+
     response.fold(
-      (errMassage) => emit(GetUserFailure(errMessage: errMassage)),
+      (errMessage) => emit(GetUserFailure(errorMessage: errMessage)),
       (user) => emit(GetUserSuccess(user: user)),
     );
   }
 
-  // getUserProfile() async {
-  // try {
-  //   emit(GetUserLoading());
-  //   final response = await api.get(
-  //     EndPonits.getUserDataEndPoint(CacheHelper().getData(key: ApiKey.id)),
-  //   );
-  //   emit(GetUserSuccess(user: UserModel.fromJson(response)));
-  // } on ServereException catch (e) {
-  //   emit(GetUserFailure(errMessage: e.errModel.erroreMassage));
-  // }
-  // }
+  // ---------- Delete User ----------
+  Future<void> deleteUser() async {
+    emit(const GetUserLoading());
 
-  //signUp() async {
-  // try {
-  //   emit(SignUpLoading());
-  //   final response = await api.post(
-  //     EndPonits.signUp,
-  //     isformdata: true,
-  //     data: {
-  //       ApiKey.name: signUpName.text,
-  //       ApiKey.phone: signUpPhoneNumber.text,
-  //       ApiKey.email: signUpEmail.text,
-  //       ApiKey.password: signUpPassword.text,
-  //       ApiKey.confirmPassword: confirmPassword.text,
-  //       ApiKey.location:
-  //           '{"{"name":"methalfa","address":"meet halfa","coordinates":[30.1572709,31.224779]}"}',
-  //       ApiKey.profilePic: await uploadImageToAPI(profilePic!),
-  //     },
-  //   );
-  //   final signUpModel = SignUpModel.fromJson(response);
+    final response = await userRepository.deleteUser();
 
-  //   emit(SignUpSuccess(massage: signUpModel.message));
-  // } on ServereException catch (e) {
-  //   emit(SignUpFailure(errMessage: e.errModel.erroreMassage));
-  // } on DioError catch (e) {
-  //   emit(SignUpFailure(errMessage: "Network error, please try again"));
-  // } catch (e) {
-  //   emit(SignUpFailure(errMessage: "Unexpected error: $e"));
-  // }
-  // }
-
-  //signIn() async {
-  // try {
-  //   emit(SignInLoading());
-
-  //   // إرسال الطلب
-  //   final response = await api.post(
-  //     EndPonits.signIn,
-  //     data: {
-  //       ApiKey.email: signInEmail.text,
-  //       ApiKey.password: signInPassword.text,
-  //     },
-  //   );
-
-  //   // تحويل الاستجابة إلى نموذج
-  //   user = SignInModel.fromJson(response);
-
-  //   // التحقق من وجود التوكن
-  //   if (user == null || user!.token.isEmpty) {
-  //     emit(
-  //       SignInFailure(errMessage: "User not found or invalid credentials"),
-  //     );
-  //     return;
-  //   }
-
-  //   // فك التوكن وحفظ البيانات
-  //   final decodedToken = JwtDecoder.decode(user!.token);
-  //   await CacheHelper().saveData(key: ApiKey.token, value: user!.token);
-  //   await CacheHelper().saveData(
-  //     key: ApiKey.id,
-  //     value: decodedToken[ApiKey.id],
-  //   );
-
-  //   emit(SignInSuccess());
-  // } on ServereException catch (e) {
-  //   emit(SignInFailure(errMessage: e.errModel.erroreMassage));
-  // } on DioError catch (e) {
-  //   emit(SignInFailure(errMessage: "Network error, please try again"));
-  // } catch (e) {
-  //   emit(SignInFailure(errMessage: "Unexpected error: $e"));
-  // }
-  //}
+    response.fold(
+      (errMessage) => emit(GetUserFailure(errorMessage: errMessage)),
+      (message) async {
+        // Clear cached data
+        await CacheHelper.clear();
+        // Use an empty UserModel instance
+        emit(GetUserSuccess(user: UserModel.empty()));
+      },
+    );
+  }
 }
